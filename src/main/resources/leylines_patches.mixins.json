@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.leadandleylines.patches.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ModernIndustrializationEnchantmentLookupMixin"
+  ],
+  "client": [
+    "ClientModernIndustrializationEnchantmentLookupMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,17 @@
+# Gradle
+.gradle/
+build/
+
+# Local credentials/config
+.env
+.env.*
+!.env.example
+
+# IDE and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Never commit generated binaries
+*.jar

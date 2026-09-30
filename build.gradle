@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+repositories {
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+}
+
+def minecraftVersion = providers.gradleProperty('minecraftVersion').orNull
+def neoForgeVersion = providers.gradleProperty('neoForgeVersion').orNull
+if (!minecraftVersion || !neoForgeVersion) {
+    throw new GradleException('Pass minecraftVersion and neoForgeVersion from the pack configuration')
+}
+
+def minecraftParts = minecraftVersion.tokenize('.').collect { part ->
+    if (!(part ==~ /\\d+/)) throw new GradleException("Invalid Minecraft version: ${minecraftVersion}")
+    Integer.parseInt(part)
+}
+if (minecraftParts.size() != 3) {
+    throw new GradleException("Expected a three-part Minecraft version, found ${minecraftVersion}")
+}
+minecraftParts[2]++
+def minecraftVersionUpperBound = minecraftParts.join('.')
+
+version = file('VERSION').text.trim()
+group = 'dev.leadandleylines'
+base.archivesName = 'leylines-patches'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+neoForge {
+    version = neoForgeVersion
+
+    mods {
+        leylines_patches {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    compileOnly 'org.spongepowered:mixin:0.8.7'
+    annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
+}
+
+processResources {
+    inputs.property 'modVersion', project.version
+    inputs.property 'minecraftVersionRange', "[${minecraftVersion},${minecraftVersionUpperBound})"
+    inputs.property 'neoForgeVersion', neoForgeVersion
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand(
+            modVersion: project.version,
+            minecraftVersionRange: "[${minecraftVersion},${minecraftVersionUpperBound})",
+            neoForgeVersion: neoForgeVersion
+        )
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+            'Implementation-Title': 'Lead and Leylines Patches',
+            'Implementation-Version': project.version
+        ])
+    }
+}

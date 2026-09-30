@@ -1,0 +1,34 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+
+[[mods]]
+modId="leylines_patches"
+version="${modVersion}"
+displayName="Lead and Leylines Patches"
+authors="TinorNoah"
+description='''Small, pack-owned compatibility fixes for Lead and Leylines.'''
+
+[[dependencies.leylines_patches]]
+modId="neoforge"
+type="required"
+versionRange="[${neoForgeVersion},)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.leylines_patches]]
+modId="minecraft"
+type="required"
+versionRange="${minecraftVersionRange}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.leylines_patches]]
+modId="modern_industrialization"
+type="required"
+versionRange="[2.5.8]"
+ordering="AFTER"
+side="BOTH"
+
+[[mixins]]
+config="leylines_patches.mixins.json"
