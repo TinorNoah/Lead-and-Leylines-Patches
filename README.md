@@ -9,37 +9,52 @@ This is not a general-purpose mod or a place for speculative workarounds. Prefer
 | Fix | Trigger and cause | Patch behavior | Sides | Compatibility boundary |
 |---|---|---|---|---|
 | Weapons of Miracles × Modern Industrialization drill enchantment lookup | Weapons of Miracles requests enchantment levels while Modern Industrialization constructs the synthetic enchantments for a steam drill or fueled diesel tool. MI 2.5.8 dereferences a null enchantment-registry lookup on that path. The reported client symptom is a crash while opening Creative Search on a connected dedicated server; the same unsafe code path exists for the diesel tool. | Before either MI `getAllEnchantments` method runs, preserve a non-null lookup. If it is null, use the active server registry on the logical server or the connected client level's registry on the client. If no world/server registry is available, leave it null rather than inventing a global registry or masking the absence of a game context. | Both | MI `2.5.8` is an exact required dependency in the mod metadata. Targets are `SteamDrillItem` and `DieselToolItem`; re-check their signatures before widening the pin. |
+| Weapons of Miracles × Extended Industrialization tool enchantment lookup | Same Weapons of Miracles call path reaches Extended Industrialization, an MI addon, so the identical unsafe dereference exists there. EI `1.16.2-1.21.1` builds its mode-based synthetic enchantments from a `RegistryLookup<Enchantment>` argument it never null-checks, so Weapons of Miracles' enchantment-level request crashes the client during Creative Search. Reported as `ElectricToolItem.includeEnchantment` NPE (`"lookup" is null`) on `CreativeModeInventoryScreen`. | Same non-null-preserving fallback as the MI fix, applied before each EI `getAllEnchantments` method runs: active server registry on the logical server, connected client level's registry on the client, otherwise leave null. | Both | EI `1.16.2-1.21.1` is an exact required dependency in the mod metadata. Targets are `ElectricToolItem` and `SteamChainsawItem`; the chainsaw is included because it carries the same unguarded lookup and would otherwise crash through the identical path. Re-check both signatures before widening the pin. |
 
 Implementation:
 
 - `src/main/java/dev/leadandleylines/patches/mixin/ModernIndustrializationEnchantmentLookupMixin.java` — server/common registry fallback.
 - `src/main/java/dev/leadandleylines/patches/mixin/ClientModernIndustrializationEnchantmentLookupMixin.java` — connected-client registry fallback.
+- `src/main/java/dev/leadandleylines/patches/mixin/ExtendedIndustrializationEnchantmentLookupMixin.java` — server/common registry fallback for EI tools.
+- `src/main/java/dev/leadandleylines/patches/mixin/ClientExtendedIndustrializationEnchantmentLookupMixin.java` — connected-client registry fallback for EI tools.
 - `src/main/resources/leylines_patches.mixins.json` — common and client Mixin registration.
-- `src/main/resources/META-INF/neoforge.mods.toml` — Minecraft, NeoForge, and exact MI version requirements.
+- `src/main/resources/META-INF/neoforge.mods.toml` — Minecraft, NeoForge, and exact MI and EI version requirements.
 
 ### Regression checks
 
 A successful Gradle build or clean server boot proves neither that Mixin applied to both targets nor that Creative Search no longer crashes. Validate in layers:
 
 1. Build with `python3 scripts/build_patches.py --pack-root <path-to-pack-repository>`. Inspect the output for Mixin/refmap or target errors.
-2. Run `python3 scripts/smoke_test.py` from the pack repository (the default is its full benchmark with an 8 GiB server heap). Confirm the server loads the patch and MI without an injection error.
-3. With a client and dedicated server using the identical patch JAR, join the server, open Creative Search, and search for the steam drill and diesel tool. Confirm the client remains connected and the creative item list populates.
-4. Exercise the server-side path with both tool types. From the server console, spawn zombies holding the items (the item names below match the current MI pin):
+2. Run `python3 scripts/smoke_test.py` from the pack repository (the default is its full benchmark with an 8 GiB server heap). Confirm the server loads the patch, MI, and EI without an injection error.
+3. With a client and dedicated server using the identical patch JAR, join the server, open Creative Search, and search for each affected item. Confirm the client remains connected and the creative item list populates.
+4. Exercise the server-side path with every affected tool. From the server console, spawn zombies holding the items (the item names below match the current MI and EI pins):
 
    ```text
-   summon minecraft:zombie 0 100 0 {HandItems:[{id:"modern_industrialization:steam_mining_drill",Count:1b},{}],PersistenceRequired:1b}
-   summon minecraft:zombie 4 100 0 {HandItems:[{id:"modern_industrialization:diesel_mining_drill",Count:1b},{}],PersistenceRequired:1b}
+   : summon minecraft:zombie 0 100 0 {HandItems:[{id:"modern_industrialization:steam_mining_drill",Count:1b},{}],PersistenceRequired:1b}
+   : summon minecraft:zombie 4 100 0 {HandItems:[{id:"modern_industrialization:diesel_mining_drill",Count:1b},{}],PersistenceRequired:1b}
+   : summon minecraft:zombie 8 100 0 {HandItems:[{id:"extended_industrialization:electric_mining_drill",Count:1b},{}],PersistenceRequired:1b}
+   : summon minecraft:zombie 12 100 0 {HandItems:[{id:"extended_industrialization:electric_chainsaw",Count:1b},{}],PersistenceRequired:1b}
+   : summon minecraft:zombie 16 100 0 {HandItems:[{id:"extended_industrialization:steam_chainsaw",Count:1b},{}],PersistenceRequired:1b}
+   : summon minecraft:zombie 20 100 0 {HandItems:[{id:"extended_industrialization:ultimate_laser_drill",Count:1b},{}],PersistenceRequired:1b}
    ```
 
-   Confirm no null lookup exception appears in the server log and both entities remain alive.
-5. Record exact client/server mod versions and the result in the PR or a dated regression note. Do not describe the client Creative Search check as passed until it has been manually performed; a server smoke test is not a substitute.
+   Confirm no null lookup exception appears in the server log and all six entities remain alive.
+5. Confirm the Mixin actually reached the intended bytecode rather than only loading cleanly. Boot the dedicated server once with `-Dmixin.debug.export=true`, then inspect `.mixin.out/class/` for `aztech/modern_industrialization/items/SteamDrillItem.class`, `aztech/modern_industrialization/items/diesel_tools/DieselToolItem.class`, `net/swedz/extended_industrialization/item/ElectricToolItem.class`, and `net/swedz/extended_industrialization/item/SteamChainsawItem.class`. Use `javap -p -c` to confirm each `getAllEnchantments` begins with the injected `leylines$useServerLookupWhenMissing` call. This proves the server/common path only; the client Mixins are registered under `client` and do not load on a dedicated server.
+6. Record exact client/server mod versions and the result in the PR or a dated regression note. Do not describe the client Creative Search check as passed until it has been manually performed; a server smoke test is not a substitute.
 
 ### Validation status — 2026-09-30
 
 - Gradle build passed and the generated JAR contains the mod and Mixin metadata.
-- The default 8 GiB full pack smoke-test benchmark passed. A separate boot with Mixin debug export confirmed the dedicated-server `SteamDrillItem` and `DieselToolItem` classes were transformed; `javap` confirmed both injected server lookup calls.
+- The default 8 GiB full pack smoke-test benchmark passed for the MI fix. A separate boot with Mixin debug export confirmed the dedicated-server `SteamDrillItem` and `DieselToolItem` classes were transformed; `javap` confirmed both injected server lookup calls.
 - The zombie-held-item server regression probe passed for both `modern_industrialization:steam_mining_drill` and `modern_industrialization:diesel_mining_drill` on MI 2.5.8 / WOM 2.0.178.
-- Creative Search has not yet been manually tested from a matching client connected to the dedicated server. That client behavior remains **unverified**; do not mark the user-reported crash fully resolved until it passes.
+- Creative Search has not yet been manually tested from a matching client connected to the dedicated server. That client behavior remains **unverified**; do not mark the user-reported MI crash fully resolved until it passes.
+
+### Validation status — 2026-09-30 (Extended Industrialization fix, `0.2.0`)
+
+- Gradle build passed; the JAR ships `ExtendedIndustrializationEnchantmentLookupMixin` and `ClientExtendedIndustrializationEnchantmentLookupMixin`, and `neoforge.mods.toml` pins `extended_industrialization` to `[1.16.2-1.21.1]`.
+- A dedicated-server boot with Mixin debug export confirmed `ElectricToolItem` and `SteamChainsawItem` were transformed alongside the two MI targets, and `javap` confirmed all four `getAllEnchantments` methods begin with the injected server lookup call. No Mixin or injection errors were logged.
+- The zombie-held-item server regression probe passed for all six items (four EI tools plus both MI drills): every summon succeeded and the run logged zero `"lookup" is null` exceptions. Post-boot exceptions in that run were unrelated (Quantified's Vulkan probe on a headless server, and an outbound HTTP connect timeout).
+- **Unverified:** the client Mixins never load on a dedicated server, so this build has not been shown to fix the reported client crash. Creative Search has not been manually tested from a matching client connected to the dedicated server while searching for the EI tools. Do not mark the EI crash resolved until that passes.
 
 ## Adding a future fix
 
