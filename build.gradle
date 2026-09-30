@@ -14,7 +14,7 @@ if (!minecraftVersion || !neoForgeVersion) {
 }
 
 def minecraftParts = minecraftVersion.tokenize('.').collect { part ->
-    if (!(part ==~ /\\d+/)) throw new GradleException("Invalid Minecraft version: ${minecraftVersion}")
+    if (!(part ==~ /\d+/)) throw new GradleException("Invalid Minecraft version: ${minecraftVersion}")
     Integer.parseInt(part)
 }
 if (minecraftParts.size() != 3) {
