@@ -4,10 +4,12 @@
   "package": "dev.leadandleylines.patches.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "ModernIndustrializationEnchantmentLookupMixin"
+    "ModernIndustrializationEnchantmentLookupMixin",
+    "ExtendedIndustrializationEnchantmentLookupMixin"
   ],
   "client": [
-    "ClientModernIndustrializationEnchantmentLookupMixin"
+    "ClientModernIndustrializationEnchantmentLookupMixin",
+    "ClientExtendedIndustrializationEnchantmentLookupMixin"
   ],
   "injectors": {
     "defaultRequire": 1

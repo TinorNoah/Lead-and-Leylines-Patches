@@ -30,5 +30,12 @@ versionRange="[2.5.8]"
 ordering="AFTER"
 side="BOTH"
 
+[[dependencies.leylines_patches]]
+modId="extended_industrialization"
+type="required"
+versionRange="[1.16.2-1.21.1]"
+ordering="AFTER"
+side="BOTH"
+
 [[mixins]]
 config="leylines_patches.mixins.json"
