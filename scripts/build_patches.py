@@ -16,7 +16,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PACK_REPOSITORY_NAME = "Lead-and-Leylines"
-PACK_MANIFEST_RELATIVE_PATH = Path("pack") / "mods" / "leylines-patches.pw.toml"
 PATCH_REPOSITORY = "TinorNoah/Lead-and-Leylines-Patches"
 VERSION_FILE = ROOT / "VERSION"
 
@@ -81,9 +80,15 @@ def java21_home() -> Path:
 def resolve_versions(args: argparse.Namespace) -> tuple[str, str]:
     minecraft_version = args.minecraft_version
     neoforge_version = args.neoforge_version
+    pack_root = args.pack_root
 
-    if args.pack_root:
-        pack_file = args.pack_root.expanduser().resolve() / "pack" / "pack.toml"
+    if pack_root is None:
+        sibling_pack = ROOT.parent / PACK_REPOSITORY_NAME
+        if (sibling_pack / "pack" / "pack.toml").is_file():
+            pack_root = sibling_pack
+
+    if pack_root:
+        pack_file = pack_root.expanduser().resolve() / "pack" / "pack.toml"
         if not pack_file.is_file():
             raise SystemExit(f"pack configuration not found: {pack_file}")
         versions = tomllib.loads(pack_file.read_text(encoding="utf-8")).get("versions", {})
