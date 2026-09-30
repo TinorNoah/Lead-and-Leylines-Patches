@@ -62,6 +62,8 @@ processResources {
 }
 
 jar {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
     manifest {
         attributes([
             'Implementation-Title': 'Lead and Leylines Patches',
