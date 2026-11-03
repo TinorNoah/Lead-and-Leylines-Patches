@@ -4,6 +4,12 @@ A small, project-owned NeoForge mod containing narrowly scoped compatibility fix
 
 This is not a general-purpose mod or a place for speculative workarounds. Prefer an upstream fix, a supported configuration/datapack override, or an existing compatible addon. Keep a project-owned patch only when those options do not solve a reproduced pack issue.
 
+## Working in this repository
+
+Agents and contributors: read [`AGENTS.md`](AGENTS.md) before making changes, then use [`docs/MAINTAINING.md`](docs/MAINTAINING.md) for the full investigation, implementation, testing, and release workflow. The central idea is **evidence first, the smallest safe compatibility shim, and honest side-specific validation**. If the cause, desired behavior, or compatibility boundary is uncertain, stop and ask the pack owner for clarification instead of guessing.
+
+This repository owns patch source and patch artifacts. The modpack repository owns the packwiz manifest, pack version, pack-wide configuration, and dedicated-server smoke-test harness. Keep those responsibilities separate; coordinate changes across repositories only when the task calls for it.
+
 ## Current fixes
 
 | Fix | Trigger and cause | Patch behavior | Sides | Compatibility boundary |
