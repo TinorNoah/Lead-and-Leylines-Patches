@@ -58,5 +58,12 @@ versionRange="[2.1.0]"
 ordering="NONE"
 side="CLIENT"
 
+[[dependencies.leylines_patches]]
+modId="singulo"
+type="optional"
+versionRange="[0.20.0,0.22)"
+ordering="NONE"
+side="CLIENT"
+
 [[mixins]]
 config="leylines_patches.mixins.json"
