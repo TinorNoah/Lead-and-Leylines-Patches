@@ -1,5 +1,6 @@
 package dev.leadandleylines.patches;
 
+import com.bawnorton.mixinsquared.canceller.MixinCancellerRegistrar;
 import java.util.List;
 import java.util.Set;
 import net.neoforged.fml.loading.LoadingModList;
@@ -18,6 +19,10 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 public final class LeylinesMixinPlugin implements IMixinConfigPlugin {
     private static final String BACKPACK_AMMO_HUD_MIXIN =
         "dev.leadandleylines.patches.mixin.TaczBackpackAmmoHudMixin";
+    private static final String SINGULO_JEI_MIXIN =
+        "dev.leadandleylines.patches.mixin.SinguloJeiNullRecipeResultMixin";
+    private static final String REPLICATION_TAB_MIXIN =
+        "dev.leadandleylines.patches.mixin.ClientReplicationCreativeTabRegistryMixin";
     private static final String GUN_HUD = "com/tacz/guns/client/gui/overlay/GunHudOverlay";
     // Military Backpack 2.1.0 injects at RETURN of this pre-1.2.0 TaCZ method, which 1.2.0 removed.
     private static final String INVENTORY_AMMO_NAME = "handleInventoryAmmo";
@@ -29,9 +34,14 @@ public final class LeylinesMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (!mixinClassName.equals(BACKPACK_AMMO_HUD_MIXIN)) return true;
         LoadingModList mods = LoadingModList.get();
-        return mods.getModFileById("tacz") != null && mods.getModFileById("militarybackpack") != null;
+        return switch (mixinClassName) {
+            case BACKPACK_AMMO_HUD_MIXIN ->
+                mods.getModFileById("tacz") != null && mods.getModFileById("militarybackpack") != null;
+            case SINGULO_JEI_MIXIN -> mods.getModFileById("singulo") != null;
+            case REPLICATION_TAB_MIXIN -> mods.getModFileById("replication") != null;
+            default -> true;
+        };
     }
 
     // Runs before any mixin is merged or injected, so Military Backpack's injector finds the restored method.
@@ -81,7 +91,9 @@ public final class LeylinesMixinPlugin implements IMixinConfigPlugin {
     }
 
     @Override
-    public void onLoad(String mixinPackage) {}
+    public void onLoad(String mixinPackage) {
+        MixinCancellerRegistrar.register(new AppliedIndustrializationJadeCanceller());
+    }
 
     @Override
     public String getRefMapperConfig() {

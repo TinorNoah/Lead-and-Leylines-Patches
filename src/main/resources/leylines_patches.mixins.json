@@ -8,12 +8,15 @@
     "ModernIndustrializationEnchantmentLookupMixin",
     "ExtendedIndustrializationEnchantmentLookupMixin",
     "EpicFightDefaultItemsPassMixin",
-    "DefaultItemsPassAttributeFallbackMixin"
+    "DefaultItemsPassAttributeFallbackMixin",
+    "DefaultItemsPassEnchantmentFallbackMixin"
   ],
   "client": [
     "ClientModernIndustrializationEnchantmentLookupMixin",
     "ClientExtendedIndustrializationEnchantmentLookupMixin",
-    "TaczBackpackAmmoHudMixin"
+    "TaczBackpackAmmoHudMixin",
+    "SinguloJeiNullRecipeResultMixin",
+    "ClientReplicationCreativeTabRegistryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
