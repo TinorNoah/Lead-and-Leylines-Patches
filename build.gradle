@@ -5,6 +5,7 @@ plugins {
 
 repositories {
     maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+    maven { url = 'https://maven.bawnorton.com/releases' }
 }
 
 def minecraftVersion = providers.gradleProperty('minecraftVersion').orNull
@@ -46,6 +47,13 @@ neoForge {
 dependencies {
     compileOnly 'org.spongepowered:mixin:0.8.7'
     annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
+    compileOnly 'com.github.bawnorton.mixinsquared:mixinsquared-common:0.3.9'
+    jarJar('com.github.bawnorton.mixinsquared:mixinsquared-neoforge') {
+        version {
+            strictly '[0.3.9,)'
+            prefer '0.3.9'
+        }
+    }
 }
 
 processResources {

@@ -1,5 +1,6 @@
 package dev.leadandleylines.patches;
 
+import com.bawnorton.mixinsquared.canceller.MixinCancellerRegistrar;
 import java.util.List;
 import java.util.Set;
 import net.neoforged.fml.loading.LoadingModList;
@@ -81,7 +82,9 @@ public final class LeylinesMixinPlugin implements IMixinConfigPlugin {
     }
 
     @Override
-    public void onLoad(String mixinPackage) {}
+    public void onLoad(String mixinPackage) {
+        MixinCancellerRegistrar.register(new AppliedIndustrializationJadeCanceller());
+    }
 
     @Override
     public String getRefMapperConfig() {
