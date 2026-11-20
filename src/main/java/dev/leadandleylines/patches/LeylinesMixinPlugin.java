@@ -21,6 +21,8 @@ public final class LeylinesMixinPlugin implements IMixinConfigPlugin {
         "dev.leadandleylines.patches.mixin.TaczBackpackAmmoHudMixin";
     private static final String SINGULO_JEI_MIXIN =
         "dev.leadandleylines.patches.mixin.SinguloJeiNullRecipeResultMixin";
+    private static final String REPLICATION_TAB_MIXIN =
+        "dev.leadandleylines.patches.mixin.ClientReplicationCreativeTabRegistryMixin";
     private static final String GUN_HUD = "com/tacz/guns/client/gui/overlay/GunHudOverlay";
     // Military Backpack 2.1.0 injects at RETURN of this pre-1.2.0 TaCZ method, which 1.2.0 removed.
     private static final String INVENTORY_AMMO_NAME = "handleInventoryAmmo";
@@ -37,6 +39,7 @@ public final class LeylinesMixinPlugin implements IMixinConfigPlugin {
             case BACKPACK_AMMO_HUD_MIXIN ->
                 mods.getModFileById("tacz") != null && mods.getModFileById("militarybackpack") != null;
             case SINGULO_JEI_MIXIN -> mods.getModFileById("singulo") != null;
+            case REPLICATION_TAB_MIXIN -> mods.getModFileById("replication") != null;
             default -> true;
         };
     }

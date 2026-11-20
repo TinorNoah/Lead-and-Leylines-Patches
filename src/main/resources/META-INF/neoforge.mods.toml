@@ -65,5 +65,12 @@ versionRange="[0.20.0,0.22)"
 ordering="NONE"
 side="CLIENT"
 
+[[dependencies.leylines_patches]]
+modId="replication"
+type="optional"
+versionRange="[1.21.1-1.2.8]"
+ordering="NONE"
+side="CLIENT"
+
 [[mixins]]
 config="leylines_patches.mixins.json"

@@ -15,7 +15,8 @@
     "ClientModernIndustrializationEnchantmentLookupMixin",
     "ClientExtendedIndustrializationEnchantmentLookupMixin",
     "TaczBackpackAmmoHudMixin",
-    "SinguloJeiNullRecipeResultMixin"
+    "SinguloJeiNullRecipeResultMixin",
+    "ClientReplicationCreativeTabRegistryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
