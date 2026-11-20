@@ -94,13 +94,18 @@ A successful Gradle build or clean server boot proves neither that Mixin applied
 
 - Reproduced from a Prism client log (pack 0.2.8, patches 0.2.3, Apothic Enchanting 1.6.4, Epic Fight 21.17.3.1, NeoForge 21.1.267): the first join to the dedicated server failed in `EpicFightClientBoundPayloadHandler.handleDataPack` → Armaments `assignUnconfiguredMeleeWeapons` → `ItemStack.forEachModifier` → `EventHooks.getAllEnchantmentLevels` → `ApothEnchEvents.clamp`, then "Network Protocol Error". The Placebo `enchanting_stats` sync arrived 5 s later; an immediate rejoin succeeded. No earlier client log had this error.
 - `javap` on NeoForge 21.1.267 confirmed the `getAllEnchantmentLevels` descriptor. Gradle build passed.
-- **Unverified:** a fresh client join to a dedicated server with this JAR, and a server boot showing the new Mixin applied without an injection error. The smoke test cannot reach the client join path.
+- Prism client with this JAR (2026-11-21): the first join to the dedicated server stayed connected. The fallback logged 10 `Enchantment level event failed` WARNs, and 499 advancements loaded.
+- Dedicated server boot (`smoke_test.py` work dir with this JAR swapped in) reached `Done` in 98.6 s and stopped cleanly with no injection error.
 - The same release adds three fixes from the same client log:
   - **Applied Industrialization Jade canceller:** `javap` confirmed the stale `addFluids(ViewGroup, List)` target against MI 2.5.13. Applied Industrialization's CurseForge project and source repository are gone, and [MI #1422](https://github.com/AztechMC/Modern-Industrialization/issues/1422) was closed as not planned, so no upstream fix is coming.
   - **Singulo JEI null guard:** `javap` showed the same unguarded `getResultItem(...).isEmpty()` in Singulo 0.20.0 and 0.21.0.
   - **Replication tab registry fallback:** `javap` on NeoForge 21.1.267 showed `LogicalSidedProvider.CLIENTWORLD` returns `Optional.of(Minecraft.level)`, which throws an NPE while the client is still in the configuration phase.
 - Gradle build passed, and the JAR nests `mixinsquared-neoforge-0.3.9`.
-- **Unverified:** all three new fixes are client-side, so the smoke test cannot exercise them. Each still needs a client session: the MI Jade tooltip, Singulo recipes in JEI, and no `create_connected:sync_config` failure on rejoin.
+- Same client session:
+  - `Cancelled mixin aeind.mixin.MachineComponentFluidsProviderMixin` was logged on both the client and the server, and neither MI Jade plugin logged `Error loading plugin`. With 0.2.3, the server logged that error for `MIJadeCommonPlugin`.
+  - `singulo:jei` registered recipes with no plugin error, on both the join and the rejoin.
+  - A disconnect and rejoin logged no `ReplicationRegistry` NPE and 0 `Failed to process a synchronized task` lines.
+- **Unverified in game:** MI Jade tooltips and Singulo recipes were checked only in the logs, not on screen.
 
 ## Adding a future fix
 
