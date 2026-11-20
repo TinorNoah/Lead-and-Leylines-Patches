@@ -31,4 +31,12 @@ public final class DefaultItemsPass {
             error.toString()
         );
     }
+
+    public static void warnBaseEnchantments(ItemStack stack, RuntimeException error) {
+        LOGGER.warn(
+            "Enchantment level event failed for {} during Epic Fight default item assignment; using its stored enchantments: {}",
+            BuiltInRegistries.ITEM.getKey(stack.getItem()),
+            error.toString()
+        );
+    }
 }

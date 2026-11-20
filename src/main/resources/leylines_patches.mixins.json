@@ -8,7 +8,8 @@
     "ModernIndustrializationEnchantmentLookupMixin",
     "ExtendedIndustrializationEnchantmentLookupMixin",
     "EpicFightDefaultItemsPassMixin",
-    "DefaultItemsPassAttributeFallbackMixin"
+    "DefaultItemsPassAttributeFallbackMixin",
+    "DefaultItemsPassEnchantmentFallbackMixin"
   ],
   "client": [
     "ClientModernIndustrializationEnchantmentLookupMixin",
