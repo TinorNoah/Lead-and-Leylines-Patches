@@ -26,7 +26,7 @@ side="BOTH"
 [[dependencies.leylines_patches]]
 modId="modern_industrialization"
 type="required"
-versionRange="[2.5.12]"
+versionRange="[2.5.13]"
 ordering="AFTER"
 side="BOTH"
 
@@ -34,6 +34,13 @@ side="BOTH"
 modId="extended_industrialization"
 type="required"
 versionRange="[1.16.5-1.21.1]"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.leylines_patches]]
+modId="er_animations"
+type="required"
+versionRange="[5.0.0-neoforge]"
 ordering="AFTER"
 side="BOTH"
 
