@@ -26,7 +26,7 @@ side="BOTH"
 [[dependencies.leylines_patches]]
 modId="modern_industrialization"
 type="required"
-versionRange="[2.5.12]"
+versionRange="[2.5.13]"
 ordering="AFTER"
 side="BOTH"
 
