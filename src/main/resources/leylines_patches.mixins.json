@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "package": "dev.leadandleylines.patches.mixin",
   "compatibilityLevel": "JAVA_21",
+  "plugin": "dev.leadandleylines.patches.LeylinesMixinPlugin",
   "mixins": [
     "ModernIndustrializationEnchantmentLookupMixin",
     "ExtendedIndustrializationEnchantmentLookupMixin",
@@ -11,7 +12,8 @@
   ],
   "client": [
     "ClientModernIndustrializationEnchantmentLookupMixin",
-    "ClientExtendedIndustrializationEnchantmentLookupMixin"
+    "ClientExtendedIndustrializationEnchantmentLookupMixin",
+    "TaczBackpackAmmoHudMixin"
   ],
   "injectors": {
     "defaultRequire": 1
